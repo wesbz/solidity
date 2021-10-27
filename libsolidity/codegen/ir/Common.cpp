@@ -41,6 +41,15 @@ YulArity YulArity::fromType(FunctionType const& _functionType)
 	};
 }
 
+string IRNames::externalFunctionPart(Declaration const& _functionOrVarDecl)
+{
+	if (auto const* function = dynamic_cast<FunctionDefinition const*>(&_functionOrVarDecl))
+		solAssert(!function->isConstructor());
+
+	return "external_fun_" + _functionOrVarDecl.name() + "_" + to_string(_functionOrVarDecl.id());
+}
+
+
 string IRNames::function(FunctionDefinition const& _function)
 {
 	if (_function.isConstructor())
