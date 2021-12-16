@@ -17,6 +17,7 @@
 // SPDX-License-Identifier: GPL-3.0
 #pragma once
 
+#include <libsolutil/CommonIO.h>
 #include <libsolutil/Exceptions.h>
 
 #include <json/value.h>
@@ -124,6 +125,23 @@ protected:
 private:
 	std::istream& m_input;
 	std::ostream& m_output;
+};
+
+/**
+ * LSP Transport using pure string buffers.
+ * Used by solcjs.
+ */
+class BufferedTransport: public IOStreamTransport
+{
+public:
+	BufferedTransport(): IOStreamTransport(m_input, m_output) {}
+
+	void appendInput(char const* _input) { m_input.write(_input, static_cast<std::streamsize>(strlen(_input))); }
+	std::string popOutput() { return util::readUntilEnd(m_output); }
+
+private:
+	std::stringstream m_input;
+	std::stringstream m_output;
 };
 
 }
