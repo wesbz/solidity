@@ -34,9 +34,18 @@
 #include <functional>
 #include <utility>
 
+#include <libsolidity/lsp/Utils.h>
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+
 using namespace std;
 using namespace solidity;
 using namespace solidity::frontend;
+
+TypeName::TypeName(int64_t _id, SourceLocation const& _location): ASTNode(_id, _location)
+{
+	lspDebug(fmt::format("TypeName({}).ctor: {}", typeid(*this).name(), _location));
+}
 
 ASTNode::ASTNode(int64_t _id, SourceLocation _location):
 	m_id(static_cast<size_t>(_id)),
