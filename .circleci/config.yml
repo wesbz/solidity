@@ -486,13 +486,6 @@ defaults:
       binary_type: solcjs
       compile_only: 1
       nodejs_version: '14'
-  - job_native_compile_ext_gnosis: &job_native_compile_ext_gnosis
-      <<: *workflow_ubuntu2004_static
-      name: t_native_compile_ext_gnosis
-      project: gnosis
-      binary_type: native
-      compile_only: 1
-      nodejs_version: '14'
 
   - job_native_test_ext_gnosis: &job_native_test_ext_gnosis
       <<: *workflow_ubuntu2004_static
@@ -1450,7 +1443,6 @@ workflows:
       - t_ems_ext_hardhat: *workflow_emscripten
 
       - t_ems_ext: *job_ems_compile_ext_colony
-      - t_ems_ext: *job_native_compile_ext_gnosis
 
       - t_ems_ext: *job_native_test_ext_gnosis
       - t_ems_ext: *job_native_test_ext_zeppelin
