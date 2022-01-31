@@ -7,7 +7,6 @@ import os
 import subprocess
 import sys
 import traceback
-from pprint import pprint
 
 from typing import Any, List, Optional, Tuple, Union
 
@@ -405,7 +404,6 @@ class SolidityLSPTestSuite: # {{{
                 }
             }
         )
-        # pprint(response)
         message = "Goto definition (" + description + ")"
         self.expect_equal(len(response['result']), 1, message)
         self.expect_location(response['result'][0], expected_uri, expected_lineNo, expected_startEndColumns)
@@ -794,7 +792,6 @@ class SolidityLSPTestSuite: # {{{
 
     def test_textDocument_definition(self, solc: JsonRpcProcess) -> None:
         self.setup_lsp(solc)
-        # TODO(pr)
         FILE_NAME = 'goto_definition'
         FILE_URI = self.get_test_file_uri(FILE_NAME)
         LIB_URI = self.get_test_file_uri('lib')
