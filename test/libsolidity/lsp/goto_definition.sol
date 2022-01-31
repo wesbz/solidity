@@ -52,4 +52,11 @@ contract C
         else
             d = c;
     }
+
+    type Price is uint128;
+    function udlTest() public pure returns (uint128)
+    {
+        Price p = Price.wrap(128);
+        return Price.unwrap(p);
+    }
 }

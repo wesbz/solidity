@@ -902,6 +902,27 @@ class SolidityLSPTestSuite: # {{{
             description="local variable declaration"
         )
 
+        # User defined type
+        self.expect_goto_definition_location(
+            solc=solc,
+            document_uri=FILE_URI,
+            document_position=(58, 8), # symbol `Price` in `Price p ...`
+            expected_uri=FILE_URI,
+            expected_lineNo=55,
+            expected_startEndColumns=(9, 14),
+            description="User defined type on left hand side"
+        )
+
+        self.expect_goto_definition_location(
+            solc=solc,
+            document_uri=FILE_URI,
+            document_position=(58, 18), # symbol `Price` in `Price.wrap()` expected_uri=FILE_URI,
+            expected_uri=FILE_URI,
+            expected_lineNo=55,
+            expected_startEndColumns=(9, 14),
+            description="User defined type on right hand side."
+        )
+
     def test_textDocument_didChange_empty_file(self, solc: JsonRpcProcess) -> None:
         """
         Starts with an empty file and changes it to look like
