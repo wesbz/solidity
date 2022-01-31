@@ -39,10 +39,6 @@
 #include <range/v3/view/subrange.hpp>
 #include <range/v3/view/map.hpp>
 
-#include <libsolidity/lsp/Utils.h>
-#include <fmt/format.h>
-#include <fmt/ostream.h>
-
 #include <memory>
 #include <optional>
 #include <string>
@@ -1291,7 +1287,7 @@ private:
 class TypeName: public ASTNode
 {
 protected:
-	explicit TypeName(int64_t _id, SourceLocation const& _location);//: ASTNode(_id, _location) {}
+	explicit TypeName(int64_t _id, SourceLocation const& _location): ASTNode(_id, _location) {}
 
 public:
 	TypeNameAnnotation& annotation() const override;
@@ -1311,7 +1307,6 @@ public:
 		std::optional<StateMutability> _stateMutability = {}
 	): TypeName(_id, _location), m_type(_elem), m_stateMutability(_stateMutability)
 	{
-		lspDebug(fmt::format("ElementaryTypeName.ctor: {}", _location));
 		solAssert(!_stateMutability.has_value() || _elem.token() == Token::Address, "");
 	}
 
@@ -1336,7 +1331,6 @@ public:
 	UserDefinedTypeName(int64_t _id, SourceLocation const& _location, ASTPointer<IdentifierPath> _namePath):
 		TypeName(_id, _location), m_namePath(std::move(_namePath))
 	{
-		lspDebug(fmt::format("UserDefinedTypeName.ctor: {}", _location));
 		solAssert(m_namePath != nullptr, "Name cannot be null.");
 	}
 	void accept(ASTVisitor& _visitor) override;
@@ -1365,9 +1359,7 @@ public:
 	):
 		TypeName(_id, _location), m_parameterTypes(std::move(_parameterTypes)), m_returnTypes(std::move(_returnTypes)),
 		m_visibility(_visibility), m_stateMutability(_stateMutability)
-	{
-		lspDebug(fmt::format("FunctionTypeName.ctor: {}", _location));
-	}
+	{}
 	void accept(ASTVisitor& _visitor) override;
 	void accept(ASTConstVisitor& _visitor) const override;
 
