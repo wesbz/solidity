@@ -137,17 +137,21 @@ extern char* solidity_compile(char const* _input, CStyleReadFileCallback _readCa
 	return solidityAllocations.emplace_back(compile(_input, _readCallback, _readContext)).data();
 }
 
-extern void solidity_lsp_start(CStyleReadFileCallback _readCallback, void* _readContext) noexcept
+extern void solidity_lsp_start(CStyleReadFileCallback /*TODO(pr) _readCallback*/, void* /*_readContext*/) noexcept
 {
 	// TODO error handling
 	// solAssert(!languageServer && !languageServerTransport)
 	languageServerTransport = make_unique<lsp::BufferedTransport>();
 }
 
-extern char* solidity_lsp_sendReceive(char const* _input) noexcept
+extern char const* solidity_lsp_send_receive(char const* _input) noexcept
 {
-	// TODO error handling
-	// solAssert(languageServer && languageServerTransport)
+	if (!languageServerTransport)
+	{
+		languageServerTransport = make_unique<lsp::BufferedTransport>();
+		languageServer = make_unique<lsp::LanguageServer>(*languageServerTransport);
+	}
+
 	languageServerTransport->appendInput(_input);
 	// TODO process bool result?
 	languageServer->runIteration();
@@ -179,6 +183,6 @@ extern void solidity_reset() noexcept
 	yul::YulStringRepository::reset();
 	solidityAllocations.clear();
 	languageServer.reset();
-	languageServerTrasport.reset();
+	languageServerTransport.reset();
 }
 }

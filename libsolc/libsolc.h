@@ -96,6 +96,7 @@ char* solidity_compile(char const* _input, CStyleReadFileCallback _readCallback,
 
 /// Switch into LSP mode. Can be undone using solidity_reset().
 void solidity_lsp_start(CStyleReadFileCallback _readCallback, void* _readContext) SOLC_NOEXCEPT;
+
 /// Send one or more JSON-RPC messages to the LSP (including the HTTP headers), expecting a response.
 /// If the input is empty, just checks for a pending response.
 /// @returns JSON-RPC message (inculding HTTP headers), can be empty (or nullptr).
@@ -103,7 +104,7 @@ void solidity_lsp_start(CStyleReadFileCallback _readCallback, void* _readContext
 ///
 /// This can cause the callback provided in solidity_lsp to be invoked.
 /// Should only be called after having called solidity_lsp.
-char const *solidity_lsp_sendReceive(char const* _input);
+char const *solidity_lsp_send_receive(char const* _input) SOLC_NOEXCEPT;
 
 /// Frees up any allocated memory.
 ///

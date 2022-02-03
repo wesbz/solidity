@@ -242,65 +242,8 @@ bool LanguageServer::run()
 {
 	while (runIteration())
 	{
-#if 0
-		MessageID id;
-		try
-		{
-			optional<Json::Value> const jsonMessage = m_client.receive();
-			if (!jsonMessage)
-				continue;
-
-			if ((*jsonMessage)["method"].isString())
-			{
-				string const methodName = (*jsonMessage)["method"].asString();
-				id = (*jsonMessage)["id"];
-
-				if (auto handler = valueOrDefault(m_handlers, methodName))
-					handler(id, (*jsonMessage)["params"]);
-				else
-					m_client.error(id, ErrorCode::MethodNotFound, "Unknown method " + methodName);
-			}
-			else
-				m_client.error({}, ErrorCode::ParseError, "\"method\" has to be a string.");
-		}
-		catch (RequestError const& error)
-		{
-			m_client.error(id, error.code(), error.comment() ? *error.comment() : ""s);
-		}
-		catch (...)
-		{
-			m_client.error(id, ErrorCode::InternalError, "Unhandled exception: "s + boost::current_exception_diagnostic_information());
-		}
-#endif
-		MessageID id;
-		try
-		{
-			optional<Json::Value> const jsonMessage = m_client.receive();
-			if (!jsonMessage)
-				continue;
-
-			if ((*jsonMessage)["method"].isString())
-			{
-				string const methodName = (*jsonMessage)["method"].asString();
-				id = (*jsonMessage)["id"];
-
-				if (auto handler = valueOrDefault(m_handlers, methodName))
-					handler(id, (*jsonMessage)["params"]);
-				else
-					m_client.error(id, ErrorCode::MethodNotFound, "Unknown method " + methodName);
-			}
-			else
-				m_client.error({}, ErrorCode::ParseError, "\"method\" has to be a string.");
-		}
-		catch (RequestError const& error)
-		{
-			m_client.error(id, error.code(), error.comment() ? *error.comment() : ""s);
-		}
-		catch (...)
-		{
-			m_client.error(id, ErrorCode::InternalError, "Unhandled exception: "s + boost::current_exception_diagnostic_information());
-		}
 	}
+
 	return m_state == State::ExitRequested || m_state == State::ExitWithoutShutdown || m_client.closed();
 }
 
@@ -332,6 +275,10 @@ bool LanguageServer::runIteration()
 			else
 				m_client.error(id, ErrorCode::MethodNotFound, "Unknown method " + methodName);
 		}
+	}
+	catch (RequestError const& error)
+	{
+		m_client.error(id, error.code(), error.comment() ? *error.comment() : ""s);
 	}
 	catch (...)
 	{
