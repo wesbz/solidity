@@ -315,7 +315,16 @@ bool ASTJsonConverter::visit(UsingForDirective const& _node)
 		make_pair("typeName", _node.typeName() ? toJson(*_node.typeName()) : Json::nullValue)
 	};
 	if (_node.usesBraces())
-		attributes.emplace_back("functionList", toJson(_node.functionsOrLibrary()));
+	{
+		Json::Value functionList;
+		for (auto const& function: _node.functionsOrLibrary())
+		{
+			Json::Value functionNode;
+			functionNode["function"] = toJson(*function);
+			functionList.append(move(functionNode));
+		}
+		attributes.emplace_back("functionList", move(functionList));
+	}
 	else
 		attributes.emplace_back("libraryName", toJson(*_node.functionsOrLibrary().front()));
 

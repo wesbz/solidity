@@ -352,11 +352,9 @@ ASTPointer<UsingForDirective> ASTJsonImporter::createUsingForDirective(Json::Val
 	if (_node.isMember("libraryName"))
 		functions.emplace_back(createIdentifierPath(_node["libraryName"]));
 	else if (_node.isMember("functionList"))
-	{
-		Json::Value array = _node["functionList"];
-		for (Json::ArrayIndex i = 0; i < array.size(); ++i)
-			functions.emplace_back(createIdentifierPath(array[i]));
-	}
+		for (Json::Value const& function: _node["functionList"])
+			functions.emplace_back(createIdentifierPath(function["function"]));
+
 	return createASTNode<UsingForDirective>(
 		_node,
 		move(functions),
