@@ -1463,19 +1463,26 @@ public:
 		SourceLocation const& _location,
 		ASTPointer<ASTString> const& _docString,
 		yul::Dialect const& _dialect,
+		ASTPointer<std::vector<ASTPointer<ASTString>>> _dialectFlags,
 		std::shared_ptr<yul::Block> _operations
 	):
-		Statement(_id, _location, _docString), m_dialect(_dialect), m_operations(std::move(_operations)) {}
+	Statement(_id, _location, _docString),
+	m_dialect(_dialect),
+	m_dialectFlags(move(_dialectFlags)),
+	m_operations(std::move(_operations))
+	{}
 	void accept(ASTVisitor& _visitor) override;
 	void accept(ASTConstVisitor& _visitor) const override;
 
 	yul::Dialect const& dialect() const { return m_dialect; }
 	yul::Block const& operations() const { return *m_operations; }
+	auto const& dialectFlags() const { return m_dialectFlags; }
 
 	InlineAssemblyAnnotation& annotation() const override;
 
 private:
 	yul::Dialect const& m_dialect;
+	ASTPointer<std::vector<ASTPointer<ASTString>>> m_dialectFlags;
 	std::shared_ptr<yul::Block> m_operations;
 };
 

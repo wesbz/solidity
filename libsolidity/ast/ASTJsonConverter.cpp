@@ -587,11 +587,23 @@ bool ASTJsonConverter::visit(InlineAssembly const& _node)
 	for (Json::Value& it: externalReferences | ranges::views::values)
 		externalReferencesJson.append(std::move(it));
 
-	setJsonNode(_node, "InlineAssembly", {
+	std::vector<pair<string, Json::Value>> attributes = {
 		make_pair("AST", Json::Value(yul::AsmJsonConverter(sourceIndexFromLocation(_node.location()))(_node.operations()))),
 		make_pair("externalReferences", std::move(externalReferencesJson)),
 		make_pair("evmVersion", dynamic_cast<solidity::yul::EVMDialect const&>(_node.dialect()).evmVersion().name())
-	});
+	};
+
+	if (_node.dialectFlags())
+	{
+		Json::Value dialectFlags(Json::arrayValue);
+		for (auto const& dialectFlag: *_node.dialectFlags())
+			if (dialectFlag)
+				dialectFlags.append(*dialectFlag);
+			else
+				dialectFlags.append(Json::nullValue);
+		attributes.emplace_back(make_pair("dialectFlags", move(dialectFlags)));
+	}
+	setJsonNode(_node, "InlineAssembly", move(attributes));
 
 	return false;
 }

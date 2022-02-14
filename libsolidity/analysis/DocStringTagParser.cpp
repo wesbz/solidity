@@ -217,7 +217,16 @@ bool DocStringTagParser::visit(InlineAssembly const& _assembly)
 
 			for (auto const& value: values)
 				if (value == "memory-safe-assembly")
+				{
+					if (_assembly.annotation().markedMemorySafe)
+						m_errorReporter.warning(
+							8544_error,
+							_assembly.location(),
+							"Inline assembly marked as memory safe using a docstring comment and the dialect string. "
+							"If you are not concerned with backwards compatibility, prefer using the dialect string only."
+						);
 					_assembly.annotation().markedMemorySafe = true;
+				}
 				else
 					m_errorReporter.warning(
 						8787_error,

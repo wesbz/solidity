@@ -27,6 +27,7 @@
 #include <libyul/AST.h>
 #include <libyul/AsmParser.h>
 #include <libyul/backends/evm/EVMDialect.h>
+#include <liblangutil/Common.h>
 #include <liblangutil/ErrorReporter.h>
 #include <liblangutil/Scanner.h>
 #include <liblangutil/SemVerHandler.h>
@@ -1313,11 +1314,32 @@ ASTPointer<InlineAssembly> Parser::parseInlineAssembly(ASTPointer<ASTString> con
 
 	expectToken(Token::Assembly);
 	yul::Dialect const& dialect = yul::EVMDialect::strictAssemblyForEVM(m_evmVersion);
+	ASTPointer<vector<ASTPointer<ASTString>>> dialectFlags;
 	if (m_scanner->currentToken() == Token::StringLiteral)
 	{
-		if (m_scanner->currentLiteral() != "evmasm")
-			fatalParserError(4531_error, "Only \"evmasm\" supported.");
+		std::string const& dialectString = m_scanner->currentLiteral();
+		auto it = dialectString.begin();
+		auto end = dialectString.end();
+		auto dialectStart = it;
+		while (it != end && !isWhiteSpace(*it))
+			++it;
+
 		// This can be used in the future to set the dialect.
+		if (string(dialectStart, it) != "evmasm")
+			fatalParserError(4531_error, "Only \"evmasm\" supported.");
+
+		dialectFlags = make_shared<vector<ASTPointer<ASTString>>>();
+
+		while (it != end)
+		{
+			while (it != end && isWhiteSpace(*it))
+				++it;
+			auto flagStart = it;
+			while (it != end && !isWhiteSpace(*it))
+				++it;
+			if (flagStart != it)
+				dialectFlags->emplace_back(make_shared<ASTString>(flagStart, it));
+		}
 		advance();
 	}
 
@@ -1327,7 +1349,7 @@ ASTPointer<InlineAssembly> Parser::parseInlineAssembly(ASTPointer<ASTString> con
 		BOOST_THROW_EXCEPTION(FatalError());
 
 	location.end = nativeLocationOf(*block).end;
-	return make_shared<InlineAssembly>(nextID(), location, _docString, dialect, block);
+	return make_shared<InlineAssembly>(nextID(), location, _docString, dialect, move(dialectFlags), block);
 }
 
 ASTPointer<IfStatement> Parser::parseIfStatement(ASTPointer<ASTString> const& _docString)
