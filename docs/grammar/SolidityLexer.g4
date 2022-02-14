@@ -248,7 +248,11 @@ LINE_COMMENT: '//' ~[\r\n]* -> channel(HIDDEN);
 mode AssemblyBlockMode;
 
 //@doc:inline
-AssemblyDialect: '"evmasm"';
+AssemblyDialectStart: '"evmasm';
+AssemblyDialectEnd: '"';
+AssemlbyDialectWS: [ \t\r\n\u000C]+ -> skip ;
+fragment AssemblyDialectFlagPart: [a-z-];
+AssemblyDialectFlag: AssemblyDialectFlagPart+;
 AssemblyLBrace: '{' -> popMode, pushMode(YulMode);
 
 AssemblyBlockWS: [ \t\r\n\u000C]+ -> skip ;

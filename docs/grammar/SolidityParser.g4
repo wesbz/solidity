@@ -471,12 +471,13 @@ emitStatement: Emit expression callArgumentList Semicolon;
  * A revert statement. The contained expression needs to refer to an error.
  */
 revertStatement: Revert expression callArgumentList Semicolon;
+assemblyDialect: AssemblyDialectStart AssemblyDialectFlag* AssemblyDialectEnd;
 /**
  * An inline assembly block.
  * The contents of an inline assembly block use a separate scanner/lexer, i.e. the set of keywords and
  * allowed identifiers is different inside an inline assembly block.
  */
-assemblyStatement: Assembly AssemblyDialect? AssemblyLBrace yulStatement* YulRBrace;
+assemblyStatement: Assembly assemblyDialect? AssemblyLBrace yulStatement* YulRBrace;
 
 //@doc:inline
 variableDeclarationList: variableDeclarations+=variableDeclaration (Comma variableDeclarations+=variableDeclaration)*;
