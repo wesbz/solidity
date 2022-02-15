@@ -375,6 +375,19 @@ bool UnusedStoreEliminator::knownUnrelated(
 			)
 				return true;
 		}
+
+		if (_op1.start && _op1.length && _op2.start && _op2.length)
+		{
+			optional<u256> length1 = knowledge.valueIfKnownConstant(*_op1.length);
+			optional<u256> length2 = knowledge.valueIfKnownConstant(*_op2.length);
+			if (
+				(length1 && *length1 <= 32) &&
+				(length2 && *length2 <= 32) &&
+				knowledge.knownToBeDifferentByAtLeast32(*_op1.start, *_op2.start)
+			)
+				return true;
+		}
+
 		// TODO for more complicated memory overlap rules, we might need to
 		// impose a non-overflow assumption.
 		// We owuld want to cover things like
