@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <set>
+#include <vector>
 
 namespace solidity::yul
 {
@@ -39,6 +40,27 @@ struct SideEffects
 		Read,
 		Write
 	};
+
+	enum class Location { Storage, Memory };
+
+	/**
+	 * Represents a read or write operation from or to one of the data locations.
+	 */
+	struct Operation
+	{
+		Location location;
+		Effect effect;
+		/// Start of affected area as an index into the parameters (if this is an opcode).
+		/// Unknown if not provided.
+		std::optional<size_t> startParameter;
+		/// Length of the affected area as an index into the parameters (if this is an opcode).
+		/// Unknown if neither this nor lengthConstant is provided.
+		std::optional<size_t> lengthArgument;
+		/// Length as a constant.
+		/// Unknown if neither this nor lengthArgument is provided.
+		std::optional<size_t> lengthConstant;
+	};
+
 
 	friend Effect operator+(Effect const& _a, Effect const& _b)
 	{
@@ -77,10 +99,16 @@ struct SideEffects
 	/// effect on `msize()`.
 	Effect memory = None;
 
+	/// Detailed read and write operations from / to a data location.
+	/// Order matters in this vector.
+	/// If nullopt, you have to rely on the other properties above.
+	/// This should not be trusted except for direct EVM opcodes.
+	std::optional<std::vector<Operation>> operations;
+
 	/// @returns the worst-case side effects.
 	static SideEffects worst()
 	{
-		return SideEffects{false, false, false, false, false, Write, Write, Write};
+		return SideEffects{false, false, false, false, false, Write, Write, Write, {}};
 	}
 
 	/// @returns the combined side effects of two pieces of code.
@@ -94,7 +122,8 @@ struct SideEffects
 			cannotLoop && _other.cannotLoop,
 			otherState + _other.otherState,
 			storage + _other.storage,
-			memory + _other.memory
+			memory + _other.memory,
+			{}
 		};
 	}
 
@@ -105,6 +134,8 @@ struct SideEffects
 		return *this;
 	}
 
+	/// Ignores `operations`
+	/// TODO where is this used?
 	bool operator==(SideEffects const& _other) const
 	{
 		return
